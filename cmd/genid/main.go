@@ -2,10 +2,12 @@ package main
 
 import (
 	"crypto/rand"
-	"flag"
 	"fmt"
 	"log"
 	"math"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/snowflake"
@@ -17,20 +19,53 @@ import (
 	"github.com/segmentio/ksuid"
 )
 
+const usage = `Usage:
+  idgen <idType> [count] [--len=n]
+
+Arguments:
+  idType   Type of ID to generate. Options:
+           ulid | uuid4 | uuid5 | uuid6 | uuid7 | ksuid | xid | nanoid | snowflake
+  count    Number of IDs to generate (default: 1)
+  --len    (Only for nanoid) Length of NanoID to generate (default: 21)
+
+Examples:
+  idgen ulid
+  idgen nanoid 10
+  idgen nanoid 5 --len=32
+  idgen uuid7
+`
+
 func main() {
-	var (
-		count   int
-		idType  string
-		nanoLen int
-	)
+	args := os.Args[1:]
 
-	flag.IntVar(&count, "n", 1, "Number of IDs to generate")
-	flag.StringVar(&idType, "type", "ulid", "ID type: ulid | uuid4 | uuid5 | uuid6 | uuid7 | ksuid | xid | nanoid | snowflake")
-	flag.IntVar(&nanoLen, "len", 21, "NanoID length (applies only to nanoid)")
-	flag.Parse()
+	if len(args) == 0 || args[0] == "help" || args[0] == "-h" {
+		fmt.Println(usage)
+		return
+	}
 
-	if count < 1 {
-		log.Fatalf("Count must be at least 1")
+	idType := args[0]
+	count := 1
+	nanoLen := 21
+
+	// Parse remaining arguments
+	for i := 1; i < len(args); i++ {
+		if strings.HasPrefix(args[i], "--len=") {
+			if idType != "nanoid" {
+				log.Fatalf("--len flag is only valid with 'nanoid'")
+			}
+			l, err := strconv.Atoi(strings.TrimPrefix(args[i], "--len="))
+			if err != nil || l < 1 {
+				log.Fatalf("Invalid --len value: %s", args[i])
+			}
+			nanoLen = l
+		} else {
+			// Expecting count
+			n, err := strconv.Atoi(args[i])
+			if err != nil || n < 1 {
+				log.Fatalf("Invalid count: %s", args[i])
+			}
+			count = n
+		}
 	}
 
 	switch idType {
@@ -53,7 +88,9 @@ func main() {
 	case "snowflake":
 		generateSnowflakes(count)
 	default:
-		log.Fatalf("Unsupported ID type: %s", idType)
+		fmt.Printf("Unsupported ID type: %s\n\n", idType)
+		fmt.Println(usage)
+		os.Exit(1)
 	}
 }
 

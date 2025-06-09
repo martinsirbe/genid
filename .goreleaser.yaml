@@ -28,35 +28,36 @@ brews:
       email: martins_irbe@mail.com
     caveats: |
       Thank you for installing the Unique ID Generator (genid)! Here are some tips to get started:
-
+        
       ## Usage
-
+    
       - Run `genid` from any terminal to generate unique identifiers instantly.
-      - Specify the ID format using the `-type` flag (e.g. `-type uuid4`, `-type ulid`, etc.).
-      - Generate multiple IDs at once using the `-n` flag.
-      - For NanoID, you can customise the output length with the `-len` flag.
-
+      - Specify the ID type as the **first argument** (e.g. `uuid4`, `ulid`, `nanoid`, etc.).
+      - Optionally provide a **count** as the second argument to generate multiple IDs (default is 1).
+      - For NanoID, you can customise the output length using the optional `--len=n` flag (default is 21).
+      - To view usage instructions, run: `genid help`
+      
       ## Supported ID Types
-
+    
       - `ulid`: Lexicographically sortable identifier
       - `uuid4`: Random UUID
       - `uuid5`: Name-based UUID (SHA-1)
       - `uuid6`: Reordered time-based UUID
-      - `uuid7`: Unix epoch time-based UUID
+      - `uuid7`: Unix epoch time-based UUID (RFC 9562)
       - `ksuid`: K-Sortable unique ID
       - `xid`: MongoDB-style unique ID
-      - `nanoid`: Compact, URL-safe unique ID
+      - `nanoid`: Compact, URL-safe unique ID (customisable length)
       - `snowflake`: Twitter-style time-based ID
-
+      
       ## Integration Ideas
-
-      - **Shell Scripts**: Use `genid` to generate test IDs or stable primary keys during automation.
-      - **Terminals**: Pipe output directly into tools like `jq`, `xargs`, or `pbcopy` for fast development workflows.
-      - **Debugging & Prototyping**: Quickly generate realistic IDs in your backend services or data pipelines.
-
-      To learn more about options, run `genid --help` or visit the GitHub repository:
+    
+      - **Shell Scripts**: Use `genid` to generate test IDs or stable primary keys in automation scripts.
+      - **Terminals**: Pipe output into tools like `jq`, `xargs`, or `pbcopy` for streamlined workflows.
+      - **Debugging & Prototyping**: Quickly generate realistic IDs for services, tests, or data pipelines.
+      
+      To learn more or contribute, visit the GitHub repository:
       https://github.com/martinsirbe/genid
-
+        
       Happy ID generating!
     test: |
       system "#{bin}/genid", "--help"
